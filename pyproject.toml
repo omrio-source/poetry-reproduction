@@ -21,3 +21,8 @@ build-backend = "poetry.core.masonry.api"
 name = "pypi-virtual"
 url = "https://localhost:26800/artifactory/api/pypi/pypi-virtual/simple"
 priority = "primary"
+
+[[tool.poetry.source]]
+name = "pypi-release"
+url = "https://localhost:26800/artifactory/api/pypi/pypi-release"
+priority = "explicit"
