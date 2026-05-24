@@ -1,0 +1,25 @@
+Hi Hung,
+
+It is great to hear that your pipeline is up and running successfully now. I would like to provide some additional context regarding how JFrog CLI handles Poetry 2.x and clarify your question about when this behavior will be changed in the CLI.
+
+This behavior is actually not a bug, but rather a reflection of a permanent architectural shift between Poetry versions. By default, JFrog CLI operates in what is known as Wrapped Mode. In Wrapped Mode, the CLI dynamically modifies your project files at runtime to inject Artifactory configurations. However, Poetry 2.x introduced significant structural updates to package resolution and configuration schemas that are fundamentally incompatible with on-the-fly file modifications. 
+
+To support Poetry 2.x, JFrog CLI utilizes Native Mode, which you successfully enabled by exporting the JFROG_RUN_NATIVE environment variable as true. In Native Mode, the CLI completely steps back and allows the native Poetry client to handle resolution and publishing directly. Because Native Mode is the official, long-term standard for Poetry 2.x and all future releases, there is no plan to change Wrapped Mode to support Poetry 2.x.
+
+While the steps Tomer provided successfully configured Poetry, you can actually simplify your Jenkinsfile further and replace those manual, raw Poetry configuration commands with first-class JFrog CLI commands. Instead of manually mapping repository URLs and passing credentials in plain text via your script, you can use the jf setup poetry command. This command securely handles your repository URLs and stores credentials directly inside your runner's environment.
+
+To transition to the cleanest, most secure Native Mode standard in your pipeline, you can update your preflight stage to run the following commands:
+
+export JFROG_RUN_NATIVE=true
+jf setup poetry --repo pypi-release --server-id rt-server-1
+jf setup poetry --repo SPARK-pypi-dev-local --server-id rt-server-1
+
+Once this setup is executed, you can continue running your standard build, install, and publish commands with the JFROG_RUN_NATIVE=true flag. This ensures your project is built and deployed flawlessly while still automatically collecting complete build-info metadata inside Artifactory.
+
+For more details on how Native Mode is configured, you can refer to the official JFrog CLI Poetry documentation (https://docs.jfrog.com/artifactory/docs/jf-poetry).
+
+Please let us know if you have any questions or need further assistance as you finalize your pipeline.
+
+Best regards,
+[Your Name]
+JFrog Support
