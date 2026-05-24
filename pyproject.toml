@@ -23,6 +23,6 @@ url = "https://localhost:26800/artifactory/api/pypi/pypi-virtual/simple"
 priority = "primary"
 
 [[tool.poetry.source]]
-name = "pypi-release"
-url = "https://localhost:26800/artifactory/api/pypi/pypi-release"
+name = "poetry-local"
+url = "https://localhost:26800/artifactory/api/pypi/poetry-local"
 priority = "explicit"
