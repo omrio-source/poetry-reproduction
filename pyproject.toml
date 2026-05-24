@@ -1,28 +1,13 @@
-[project]
+[tool.poetry]
 name = "poetry-jfrog-learn"
 version = "0.1.0"
-description = ""
-authors = [
-    {name = "Omrio",email = "omrio@jfrog.com"}
-]
-requires-python = ">=3.12"
-dependencies = [
-]
-
-[tool.poetry]
+description = "Reproduction project"
+authors = ["Omrio <omrio@jfrog.com>"]
 packages = [{ include = "poetry_testing" }]
 
+[tool.poetry.dependencies]
+python = ">=3.12"
 
 [build-system]
-requires = ["poetry-core>=2.0.0,<3.0.0"]
+requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
-
-[[tool.poetry.source]]
-name = "pypi-virtual"
-url = "https://localhost:26800/artifactory/api/pypi/pypi-virtual/simple"
-priority = "primary"
-
-[[tool.poetry.source]]
-name = "poetry-local"
-url = "https://localhost:26800/artifactory/api/pypi/poetry-local"
-priority = "explicit"
