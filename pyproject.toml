@@ -1,28 +1,16 @@
 [project]
-name = "poetry-jfrog-learn"
+name = "pip-jfrog-learn"
 version = "0.1.0"
-description = ""
+description = "pip + requirements.txt JFrog Artifactory reproduction"
 authors = [
-    {name = "Omrio",email = "omrio@jfrog.com"}
+    { name = "Omrio", email = "omrio@jfrog.com" }
 ]
-requires-python = ">=3.12"
-dependencies = [
-]
-
-[tool.poetry]
-packages = [{ include = "poetry_testing" }]
-
+requires-python = ">=3.11"
+dependencies = []
 
 [build-system]
-requires = ["poetry-core>=2.0.0,<3.0.0"]
-build-backend = "poetry.core.masonry.api"
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
 
-[[tool.poetry.source]]
-name = "pypi-release"
-url = "https://localhost:26800/artifactory/api/pypi/pypi-release/simple"
-priority = "primary"
-
-[[tool.poetry.source]]
-name = "poetry-local"
-url = "https://localhost:26800/artifactory/api/pypi/poetry-local"
-priority = "explicit"
+[tool.setuptools]
+packages = ["pip_jfrog_learn"]

@@ -1,0 +1,69 @@
+name: pip jfrog repro (customer flow)
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: self-hosted
+    defaults:
+      run:
+        shell: bash
+    env:
+      # One build identity shared by every jf command (matches the customer's corrected pipeline).
+      JFROG_CLI_BUILD_NAME: pip-jfrog-learn
+      JFROG_CLI_BUILD_NUMBER: ${{ github.run_number }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup JFrog CLI
+        uses: jfrog/setup-jfrog-cli@v4
+
+      # localhost = self-signed cert (--insecure-tls). The token is a reference (non-JWT)
+      # token, so pip needs basic auth -> --user=admin is required.
+      - name: Configure JFrog server
+        run: |
+          jf c rm setup-jfrog-cli-server --quiet 2>/dev/null || true
+          jf c add setup-jfrog-cli-server \
+            --url=https://localhost:21500 \
+            --user=admin \
+            --access-token=${{ secrets.JF_ACCESS_TOKEN }} \
+            --insecure-tls --interactive=false
+          jf c use setup-jfrog-cli-server
+
+      # Resolve from pypi-virtual, deploy to a pypi LOCAL repo (covers jf pip + jf twine).
+      - name: Configure pip for Artifactory
+        run: |
+          jf pip-config \
+            --server-id-resolve=setup-jfrog-cli-server --repo-resolve=pypi-virtual \
+            --server-id-deploy=setup-jfrog-cli-server --repo-deploy=pypi-local   # CONFIRM deploy repo
+
+      # Source-side SCA gate (same as customer). Needs Xray + a watch to enforce policy.
+      - name: JFrog Audit
+        run: jf audit --fail=false   # add --watches=<watch-name> to enforce a policy
+
+      # Clean venv is required for accurate build-info.
+      - name: Install dependencies with build-info
+        run: |
+          python3 -m venv venv
+          source venv/bin/activate
+          python -m pip install --upgrade pip setuptools wheel build
+          jf pip install -r requirements.txt
+
+      - name: Build wheel
+        run: |
+          source venv/bin/activate
+          python -m build --wheel --no-isolation
+
+      # Collect env, upload the produced wheel WITH build association, then publish the build.
+      - name: Collect env, upload wheel, publish build
+        run: |
+          jf rt build-collect-env
+          jf rt upload "dist/*.whl" pypi-local/   # CONFIRM deploy repo
+          jf rt build-publish
+
+      # Governance scan of the complete published build (deps + artifact). Needs Xray + a watch.
+      - name: JFrog Build Scan
+        run: jf bs --fail=false   # add --watches=<watch-name> to enforce a policy

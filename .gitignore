@@ -6,3 +6,6 @@ dist/
 *.pyc
 __pycache__/
 commands.sh
+venv/
+pip.conf
+.pip/
