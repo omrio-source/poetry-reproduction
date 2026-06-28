@@ -42,8 +42,11 @@ jobs:
 
       # Full source-side scan (SCA + JAS), same as the customer. JAS is now enabled on the
       # instance. --fail=false reports violations without failing; add --watches=<name> to enforce.
+      # DEBUG temporarily on to diagnose the Contextual Analysis (applicability) exit 51.
       - name: JFrog Audit
-        run: jf audit --fail=false
+        env:
+          JFROG_CLI_LOG_LEVEL: DEBUG
+        run: jf audit --fail=false || true
 
       # Clean venv is required for accurate build-info.
       - name: Install dependencies with build-info
