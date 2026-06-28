@@ -40,11 +40,10 @@ jobs:
             --server-id-resolve=setup-jfrog-cli-server --repo-resolve=pypi-virtual \
             --server-id-deploy=setup-jfrog-cli-server --repo-deploy=pypi-local   # CONFIRM deploy repo
 
-      # Source-side SCA gate (same as customer). --sca skips the JAS applicability sub-scan,
-      # which needs an Advanced Security entitlement this instance lacks (exit 51).
-      # || true keeps it non-blocking for the repro; add --watches=<name> to enforce a policy.
+      # Full source-side scan (SCA + JAS), same as the customer. JAS is now enabled on the
+      # instance. --fail=false reports violations without failing; add --watches=<name> to enforce.
       - name: JFrog Audit
-        run: jf audit --sca --fail=false || true
+        run: jf audit --fail=false
 
       # Clean venv is required for accurate build-info.
       - name: Install dependencies with build-info
@@ -67,6 +66,6 @@ jobs:
           jf rt upload "dist/*.whl" pypi-local/   # CONFIRM deploy repo
           jf rt build-publish
 
-      # Governance scan of the complete published build (deps + artifact). Needs Xray + a watch.
+      # Governance scan of the complete published build (deps + artifact).
       - name: JFrog Build Scan
-        run: jf bs --fail=false || true   # add --watches=<watch-name> to enforce a policy
+        run: jf bs --fail=false   # add --watches=<watch-name> to enforce a policy
