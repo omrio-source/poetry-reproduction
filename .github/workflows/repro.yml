@@ -40,13 +40,10 @@ jobs:
             --server-id-resolve=setup-jfrog-cli-server --repo-resolve=pypi-virtual \
             --server-id-deploy=setup-jfrog-cli-server --repo-deploy=pypi-local   # CONFIRM deploy repo
 
-      # Full source-side scan (SCA + JAS), same as the customer. JAS is now enabled on the
-      # instance. --fail=false reports violations without failing; add --watches=<name> to enforce.
-      # DEBUG temporarily on to diagnose the Contextual Analysis (applicability) exit 51.
+      # Full source-side scan (SCA + JAS incl. Contextual Analysis), same as the customer.
+      # --fail=false reports violations without failing; add --watches=<name> to enforce.
       - name: JFrog Audit
-        env:
-          JFROG_CLI_LOG_LEVEL: DEBUG
-        run: jf audit --fail=false || true
+        run: jf audit --fail=false
 
       # Clean venv is required for accurate build-info.
       - name: Install dependencies with build-info
