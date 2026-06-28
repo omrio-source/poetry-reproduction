@@ -15,6 +15,10 @@ jobs:
       # One build identity shared by every jf command (matches the customer's corrected pipeline).
       JFROG_CLI_BUILD_NAME: pip-jfrog-learn
       JFROG_CLI_BUILD_NUMBER: ${{ github.run_number }}
+      # Point NATIVE pip (the build-tool bootstrap) at the live instance. Overrides any stale
+      # machine-level pip.conf on the runner. Env var beats config file in pip precedence.
+      PIP_INDEX_URL: https://admin:${{ secrets.JF_ACCESS_TOKEN }}@localhost:21500/artifactory/api/pypi/pypi-virtual/simple
+      PIP_TRUSTED_HOST: localhost
     steps:
       - uses: actions/checkout@v4
 
