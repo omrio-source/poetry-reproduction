@@ -1,0 +1,27 @@
+name: "Frogbot Scan Repository"
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 0 * * *"   # daily repo scan at 00:00 GMT
+  push:
+    branches: [ main ]
+permissions:
+  pull-requests: write
+  contents: write          # required so Frogbot can open fix pull requests
+  security-events: write
+jobs:
+  scan-repository:
+    runs-on: self-hosted   # localhost:21500 is only reachable from the self-hosted runner
+    strategy:
+      matrix:
+        branch: [ "main" ]
+    steps:
+      - uses: jfrog/frogbot@v2
+        env:
+          JF_URL: ${{ secrets.JF_URL }}
+          JF_ACCESS_TOKEN: ${{ secrets.JF_ACCESS_TOKEN }}
+          JF_GIT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          JF_GIT_BASE_BRANCH: ${{ matrix.branch }}
+          JF_DEPS_REPO: pypi-virtual
+          JF_REQUIREMENTS_FILE: requirements.txt
+          # JF_WATCHES: <watch-name>
