@@ -9,6 +9,7 @@ permissions:
 jobs:
   scan-pull-request:
     runs-on: self-hosted   # localhost:21500 is only reachable from the self-hosted runner
+    environment: frogbot   # required by Frogbot for pull_request_target (secret-exfiltration guard)
     steps:
       - uses: jfrog/frogbot@v2
         env:
